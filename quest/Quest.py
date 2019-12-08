@@ -42,8 +42,9 @@ import time
 
 import numpy as np
 
+
 def getinf(x):
-    return np.nonzero( np.isinf( np.atleast_1d(x) ) )
+    return np.nonzero(np.isinf(np.atleast_1d(x)))
 
 
 class QuestObject:
@@ -101,7 +102,7 @@ class QuestObject:
     i.e. they are impossible.
 
     """
-    def __init__(self,tGuess,tGuessSd,pThreshold,beta,delta,gamma,grain=0.01,range=None):
+    def __init__(self, tGuess, tGuessSd, pThreshold, beta, delta, gamma, grain=0.01, range=None):
         """Initialize Quest parameters.
 
         Create an instance of QuestObject with all the information
@@ -109,14 +110,14 @@ class QuestObject:
 
         This was converted from the Psychtoolbox's QuestCreate function.
         """
-        grain = float(grain) # make sure grain is a float
+        grain = float(grain)  # make sure grain is a float
         if range is None:
             dim = 500
         else:
             if range <= 0:
                 raise ValueError('argument "range" must be greater than zero.')
-            dim=range/grain
-            dim=2*math.ceil(dim/2.0) # round up to even integer
+            dim = range/grain
+            dim = 2*math.ceil(dim/2.0)  # round up to even integer
         self.updatePdf = True
         self.warnPdf = True
         self.normalizePdf = False
@@ -130,7 +131,7 @@ class QuestObject:
         self.dim = dim
         self.recompute()
 
-    def beta_analysis(self,stream=None):
+    def beta_analysis(self, stream=None):
         """Analyze the quest function with beta as a free parameter.
 
         It returns the mean estimates of alpha (as logC) and
@@ -140,32 +141,32 @@ class QuestObject:
         def beta_analysis1(stream=None):
             """private function called by beta_analysis()"""
             if stream is None:
-                stream=sys.stdout
+                stream = sys.stdout
             q2 = []
-            for i in range(1,17):
-                q_copy=copy.copy(self)
-                q_copy.beta=2**(i/4.0)
-                q_copy.dim=250
-                q_copy.grain=0.02
+            for i in range(1, 17):
+                q_copy = copy.copy(self)
+                q_copy.beta = 2**(i/4.0)
+                q_copy.dim = 250
+                q_copy.grain = 0.02
                 q_copy.recompute()
                 q2.append(q_copy)
-            na = np.array # shorthand
-            t2    = na([q2i.mean() for q2i in q2])
-            p2    = na([q2i.pdf_at(t2i) for q2i,t2i in zip(q2,t2)])
-            sd2   = na([q2i.sd() for q2i in q2])
+            na = np.array  # shorthand
+            t2 = na([q2i.mean() for q2i in q2])
+            p2 = na([q2i.pdf_at(t2i) for q2i, t2i in zip(q2, t2)])
+            sd2 = na([q2i.sd() for q2i in q2])
             beta2 = na([q2i.beta for q2i in q2])
-            i=np.argsort(p2)[-1]
-            t=t2[i]
-            sd=q2[i].sd()
-            p=np.sum(p2)
-            betaMean=np.sum(p2*beta2)/p
-            betaSd=math.sqrt(np.sum(p2*beta2**2)/p-(np.sum(p2*beta2)/p)**2)
-            iBetaMean=np.sum(p2/beta2)/p
-            iBetaSd=math.sqrt(np.sum(p2/beta2**2)/p-(np.sum(p2/beta2)/p)**2)
-            stream.write('%5.2f	%5.2f	%4.1f	%4.1f	%6.3f\n'%(t,sd,1/iBetaMean,betaSd,self.gamma))
+            i = np.argsort(p2)[-1]
+            t = t2[i]
+            sd = q2[i].sd()
+            p = np.sum(p2)
+            betaMean = np.sum(p2*beta2)/p
+            betaSd = math.sqrt(np.sum(p2*beta2**2)/p-(np.sum(p2*beta2)/p)**2)
+            iBetaMean = np.sum(p2/beta2)/p
+            iBetaSd = math.sqrt(np.sum(p2/beta2**2)/p-(np.sum(p2/beta2)/p)**2)
+            stream.write('%5.2f	%5.2f	%4.1f	%4.1f	%6.3f\n' % (t, sd, 1/iBetaMean, betaSd, self.gamma))
         print 'Now re-analyzing with beta as a free parameter. . . .'
         if stream is None:
-            stream=sys.stdout
+            stream = sys.stdout
         stream.write('logC 	 sd 	 beta	 sd	 gamma\n');
         beta_analysis1(stream)
 
@@ -188,11 +189,11 @@ class QuestObject:
         This was converted from the Psychtoolbox's QuestMode function.
         """
         iMode = np.argsort(self.pdf)[-1]
-        p=self.pdf[iMode]
-        t=self.x[iMode]+self.tGuess
-        return t,p
+        p = self.pdf[iMode]
+        t = self.x[iMode]+self.tGuess
+        return t, p
 
-    def p(self,x):
+    def p(self, x):
         """probability of correct response at intensity x.
 
         p=q.p(x)
@@ -206,19 +207,19 @@ class QuestObject:
             return self.x2[0]
         if x > self.x2[-1]:
             return self.x2[-1]
-        return np.interp(x,self.x2,self.p2)
+        return np.interp(x, self.x2, self.p2)
 
-    def pdf_at(self,t):
+    def pdf_at(self, t):
         """The (unnormalized) probability density of candidate threshold 't'.
 
         This was converted from the Psychtoolbox's QuestPdf function.
         """
-        i=int(round((t-self.tGuess)/self.grain))+1+self.dim/2
-        i=min(len(self.pdf),max(1,i))-1
-        p=self.pdf[i]
+        i = int(round((t-self.tGuess)/self.grain))+1+self.dim/2
+        i = min(len(self.pdf), max(1, i))-1
+        p = self.pdf[i]
         return p
 
-    def quantile(self,quantileOrder=None):
+    def quantile(self, quantileOrder=None):
         """Get Quest recommendation for next trial level.
 
         intensity=q.quantile([quantileOrder])
@@ -239,13 +240,13 @@ class QuestObject:
         p = np.cumsum(self.pdf)
         if len(getinf(p[-1])[0]):
             raise RuntimeError('pdf is not finite')
-        if p[-1]==0:
+        if p[-1] == 0:
             raise RuntimeError('pdf is all zero')
-        m1p = np.concatenate(([-1],p))
-        index = np.nonzero( m1p[1:]-m1p[:-1] )[0]
+        m1p = np.concatenate(([-1], p))
+        index = np.nonzero(m1p[1:]-m1p[:-1])[0]
         if len(index) < 2:
-            raise RuntimeError('pdf has only %g nonzero point(s)'%len(index))
-        ires = np.interp([quantileOrder*p[-1]],p[index],self.x[index])[0]
+            raise RuntimeError('pdf has only %g nonzero point(s)' % len(index))
+        ires = np.interp([quantileOrder*p[-1]], p[index], self.x[index])[0]
         return self.tGuess+ires
 
     def sd(self):
@@ -254,11 +255,11 @@ class QuestObject:
         Get the sd of the threshold distribution.
 
         This was converted from the Psychtoolbox's QuestSd function."""
-        p=np.sum(self.pdf)
-        sd=math.sqrt(np.sum(self.pdf*self.x**2)/p-(np.sum(self.pdf*self.x)/p)**2)
+        p = np.sum(self.pdf)
+        sd = math.sqrt(np.sum(self.pdf*self.x**2)/p-(np.sum(self.pdf*self.x)/p)**2)
         return sd
 
-    def simulate(self,tTest,tActual):
+    def simulate(self, tTest, tActual):
         """Simulate an observer with given Quest parameters.
 
         response=QuestSimulate(q,intensity,tActual)
@@ -266,8 +267,8 @@ class QuestObject:
         Simulate the response of an observer with threshold tActual.
 
         This was converted from the Psychtoolbox's QuestSimulate function."""
-        t = min( max(tTest-tActual, self.x2[0]), self.x2[-1] )
-        response= np.interp([t],self.x2,self.p2)[0] > random.random()
+        t = min(max(tTest-tActual, self.x2[0]), self.x2[-1])
+        response = np.interp([t], self.x2, self.p2)[0] > random.random()
         return response
 
     def recompute(self):
@@ -285,28 +286,28 @@ class QuestObject:
         if not self.updatePdf:
             return
         if self.gamma > self.pThreshold:
-            warnings.warn( 'reducing gamma from %.2f to 0.5'%self.gamma)
+            warnings.warn('reducing gamma from %.2f to 0.5' % self.gamma)
             self.gamma = 0.5
-        self.i = np.arange(-self.dim/2,self.dim/2+1)
+        self.i = np.arange(-self.dim/2, self.dim/2+1)
         self.x = self.i * self.grain
         self.pdf = np.exp(-0.5*(self.x/self.tGuessSd)**2)
         self.pdf = self.pdf/np.sum(self.pdf)
-        i2 = np.arange(-self.dim,self.dim+1)
+        i2 = np.arange(-self.dim, self.dim+1)
         self.x2 = i2*self.grain
         self.p2 = self.delta*self.gamma+(1-self.delta)*(1-(1-self.gamma)*np.exp(-10**(self.beta*self.x2)))
         if self.p2[0] >= self.pThreshold or self.p2[-1] <= self.pThreshold:
-            raise RuntimeError('psychometric function range [%.2f %.2f] omits %.2f threshold'%(self.p2[0],self.p2[-1],self.pThreshold)) # XXX
+            raise RuntimeError('psychometric function range [%.2f %.2f] omits %.2f threshold' % (self.p2[0], self.p2[-1], self.pThreshold))  # XXX
         if len(getinf(self.p2)[0]):
             raise RuntimeError('psychometric function p2 is not finite')
-        index = np.nonzero( self.p2[1:]-self.p2[:-1] )[0] # strictly monotonic subset
+        index = np.nonzero(self.p2[1:]-self.p2[:-1])[0]  # strictly monotonic subset
         if len(index) < 2:
-            raise RuntimeError('psychometric function has only %g strictly monotonic points'%len(index))
-        self.xThreshold = np.interp([self.pThreshold],self.p2[index],self.x2[index])[0]
+            raise RuntimeError('psychometric function has only %g strictly monotonic points' % len(index))
+        self.xThreshold = np.interp([self.pThreshold], self.p2[index], self.x2[index])[0]
         self.p2 = self.delta*self.gamma+(1-self.delta)*(1-(1-self.gamma)*np.exp(-10**(self.beta*(self.x2+self.xThreshold))))
         if len(getinf(self.p2)[0]):
             raise RuntimeError('psychometric function p2 is not finite')
-        self.s2 = np.array( ((1-self.p2)[::-1], self.p2[::-1]) )
-        if not hasattr(self,'intensity') or not hasattr(self,'response'):
+        self.s2 = np.array(((1-self.p2)[::-1], self.p2[::-1]))
+        if not hasattr(self, 'intensity') or not hasattr(self, 'response'):
             self.intensity = []
             self.response = []
         if len(getinf(self.s2)[0]):
@@ -318,27 +319,27 @@ class QuestObject:
         pH = self.p2[-1]
         pE = pH*math.log(pH+eps)-pL*math.log(pL+eps)+(1-pH+eps)*math.log(1-pH+eps)-(1-pL+eps)*math.log(1-pL+eps)
         pE = 1/(1+math.exp(pE/(pL-pH)))
-        self.quantileOrder=(pE-pL)/(pH-pL)
+        self.quantileOrder = (pE-pL)/(pH-pL)
 
         if len(getinf(self.pdf)[0]):
             raise RuntimeError('prior pdf is not finite')
 
         # recompute the pdf from the historical record of trials
-        for intensity, response in zip(self.intensity,self.response):
-            inten = max(-1e10,min(1e10,intensity)) # make intensity finite
+        for intensity, response in zip(self.intensity, self.response):
+            inten = max(-1e10, min(1e10, intensity))  # make intensity finite
             ii = len(self.pdf) + self.i-round((inten-self.tGuess)/self.grain)-1
-            if ii[0]<0:
+            if ii[0] < 0:
                 ii = ii-ii[0]
-            if ii[-1]>=self.s2.shape[1]:
+            if ii[-1] >= self.s2.shape[1]:
                 ii = ii+self.s2.shape[1]-ii[-1]-1
             iii = ii.astype(np.int_)
             if not np.allclose(ii,iii):
                 raise ValueError('truncation error')
-            self.pdf = self.pdf*self.s2[response,iii]
-            if self.normalizePdf and k%100==0:
-                self.pdf = self.pdf/np.sum(self.pdf) # avoid underflow; keep the pdf normalized
+            self.pdf = self.pdf*self.s2[response, iii]
+            if self.normalizePdf and k % 100 == 0:
+                self.pdf = self.pdf/np.sum(self.pdf)  # avoid underflow; keep the pdf normalized
         if self.normalizePdf:
-            self.pdf = self.pdf/np.sum(self.pdf) # avoid underflow; keep the pdf normalized
+            self.pdf = self.pdf/np.sum(self.pdf)  # avoid underflow; keep the pdf normalized
         if len(getinf(self.pdf)[0]):
             raise RuntimeError('prior pdf is not finite')
 
@@ -354,29 +355,30 @@ class QuestObject:
         This was converted from the Psychtoolbox's QuestUpdate function."""
 
         if response < 0 or response > self.s2.shape[0]:
-            raise RuntimeError('response %g out of range 0 to %d'%(response,self.s2.shape[0]))
+            raise RuntimeError('response %g out of range 0 to %d' % (response, self.s2.shape[0]))
         if self.updatePdf:
-            inten = max(-1e10,min(1e10,intensity)) # make intensity finite
+            inten = max(-1e10, min(1e10, intensity))  # make intensity finite
             ii = len(self.pdf) + self.i-round((inten-self.tGuess)/self.grain)-1
-            if ii[0]<0 or ii[-1] > self.s2.shape[1]:
+            if ii[0] < 0 or ii[-1] > self.s2.shape[1]:
                 if self.warnPdf:
-                    low=(1-len(self.pdf)-self.i[0])*self.grain+self.tGuess
-                    high=(self.s2.shape[1]-len(self.pdf)-self.i[-1])*self.grain+self.tGuess
-                    warnings.warn( 'intensity %.2f out of range %.2f to %.2f. Pdf will be inexact.'%(intensity,low,high),
-                                   RuntimeWarning,stacklevel=2)
-                if ii[0]<0:
+                    low = (1-len(self.pdf)-self.i[0])*self.grain+self.tGuess
+                    high = (self.s2.shape[1]-len(self.pdf)-self.i[-1])*self.grain+self.tGuess
+                    warnings.warn('intensity %.2f out of range %.2f to %.2f. Pdf will be inexact.' % (intensity, low, high),
+                                   RuntimeWarning, stacklevel=2)
+                if ii[0] < 0:
                     ii = ii-ii[0]
                 else:
                     ii = ii+self.s2.shape[1]-ii[-1]-1
             iii = ii.astype(np.int_)
-            if not np.allclose(ii,iii):
+            if not np.allclose(ii, iii):
                 raise ValueError('truncation error')
-            self.pdf = self.pdf*self.s2[response,iii]
+            self.pdf = self.pdf*self.s2[response, iii]
             if self.normalizePdf:
-                self.pdf=self.pdf/np.sum(self.pdf)
+                self.pdf = self.pdf/np.sum(self.pdf)
         # keep a historical record of the trials
         self.intensity.append(intensity)
         self.response.append(response)
+
 
 def demo():
     """Demo script for Quest routines.
@@ -432,49 +434,50 @@ def demo():
         except:
             pass
 
-    tGuessSd = 2.0 # sd of Gaussian before clipping to specified range
+    tGuessSd = 2.0  # sd of Gaussian before clipping to specified range
     pThreshold = 0.82
     beta = 3.5
     delta = 0.01
     gamma = 0.5
-    q=QuestObject(tGuess,tGuessSd,pThreshold,beta,delta,gamma)
+    q = QuestObject(tGuess,tGuessSd,pThreshold,beta,delta,gamma)
 
     # Simulate a series of trials.
-    trialsDesired=100
+    trialsDesired = 100
     wrongRight = 'wrong', 'right'
-    timeZero=time.time()
+    timeZero = time.time()
     for k in range(trialsDesired):
         # Get recommended level.  Choose your favorite algorithm.
-        tTest=q.quantile()
-        #tTest=q.mean()
-        #tTest=q.mode()
+        tTest = q.quantile()
+        #tTest = q.mean()
+        #tTest = q.mode()
 
-        tTest=tTest+random.choice([-0.1,0,0.1])
+        tTest = tTest+random.choice([-0.1, 0, 0.1])
 
         # Simulate a trial
-	timeSplit=time.time(); # omit simulation and printing from reported time/trial.
-        response=q.simulate(tTest,tActual)
-        print 'Trial %3d at %4.1f is %s'%(k+1,tTest,wrongRight[int(response)])
-	timeZero=timeZero+time.time()-timeSplit;
+        timeSplit = time.time();  # omit simulation and printing from reported time/trial.
+        response = q.simulate(tTest, tActual)
+        print 'Trial %3d at %4.1f is %s' % (k+1, tTest, wrongRight[int(response)])
+        timeZero = timeZero+time.time()-timeSplit;
 
         # Update the pdf
-	q.update(tTest,response);
+    q.update(tTest, response);
 
     # Print results of timing.
-    print '%.0f ms/trial'%(1000*(time.time()-timeZero)/trialsDesired)
+    print '%.0f ms/trial' % (1000*(time.time()-timeZero)/trialsDesired)
 
     # Get final estimate.
-    t=q.mean()
-    sd=q.sd()
-    print 'Mean threshold estimate is %4.2f +/- %.2f'%(t,sd)
-    #t=QuestMode(q);
+    t = q.mean()
+    sd = q.sd()
+    print 'Mean threshold estimate is %4.2f +/- %.2f' % (t,sd)
+    #t = QuestMode(q);
     #print 'Mode threshold estimate is %4.2f'%t
 
     print '\nQuest beta analysis. Beta controls the steepness of the Weibull function.\n'
     q.beta_analysis()
     print 'Actual parameters of simulated observer:'
     print 'logC	beta	gamma'
-    print '%5.2f	%4.1f	%5.2f'%(tActual,q.beta,q.gamma)
+    print '%5.2f	%4.1f	%5.2f' % (tActual, q.beta, q.gamma)
+
 
 if __name__ == '__main__':
-    demo() # run the demo
+    demo()  # run the demo
