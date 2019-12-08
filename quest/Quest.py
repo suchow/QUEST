@@ -167,7 +167,7 @@ class QuestObject:
         print 'Now re-analyzing with beta as a free parameter. . . .'
         if stream is None:
             stream = sys.stdout
-        stream.write('logC 	 sd 	 beta	 sd	 gamma\n');
+        stream.write('logC 	 sd 	 beta	 sd	 gamma\n')
         beta_analysis1(stream)
 
     def mean(self):
@@ -343,7 +343,7 @@ class QuestObject:
         if len(getinf(self.pdf)[0]):
             raise RuntimeError('prior pdf is not finite')
 
-    def update(self,intensity,response):
+    def update(self, intensity, response):
         """Update Quest posterior pdf.
 
         Update self to reflect the results of this trial. The
@@ -454,13 +454,13 @@ def demo():
         tTest = tTest+random.choice([-0.1, 0, 0.1])
 
         # Simulate a trial
-        timeSplit = time.time();  # omit simulation and printing from reported time/trial.
+        timeSplit = time.time()  # omit simulation and printing from reported time/trial.
         response = q.simulate(tTest, tActual)
         print 'Trial %3d at %4.1f is %s' % (k+1, tTest, wrongRight[int(response)])
-        timeZero = timeZero+time.time()-timeSplit;
+        timeZero = timeZero+time.time()-timeSplit
 
         # Update the pdf
-    q.update(tTest, response);
+    q.update(tTest, response)
 
     # Print results of timing.
     print '%.0f ms/trial' % (1000*(time.time()-timeZero)/trialsDesired)
@@ -469,7 +469,7 @@ def demo():
     t = q.mean()
     sd = q.sd()
     print 'Mean threshold estimate is %4.2f +/- %.2f' % (t,sd)
-    #t = QuestMode(q);
+    #t = QuestMode(q)
     #print 'Mode threshold estimate is %4.2f'%t
 
     print '\nQuest beta analysis. Beta controls the steepness of the Weibull function.\n'
