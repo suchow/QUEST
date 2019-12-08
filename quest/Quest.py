@@ -419,19 +419,17 @@ def demo():
     tActual = None
     while tActual is None:
         sys.stdout.write('Specify true threshold of simulated observer: ')
-        input = raw_input()
         try:
-            tActual = float(input)
-        except:
+            tActual = float(input())
+        except Exception:
             pass
 
     tGuess = None
     while tGuess is None:
         sys.stdout.write('Estimate threshold: ')
-        input = raw_input()
         try:
-            tGuess = float(input)
-        except:
+            tGuess = float(input())
+        except Exception:
             pass
 
     tGuessSd = 2.0  # sd of Gaussian before clipping to specified range
