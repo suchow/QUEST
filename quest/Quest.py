@@ -45,12 +45,6 @@ import numpy as np
 def getinf(x):
     return np.nonzero( np.isinf( np.atleast_1d(x) ) )
 
-# Use Python's bool constants if available, make aliases if not
-try:
-    True
-except NameError:
-    True = 1==1
-    False = 1==0
 
 class QuestObject:
 
